@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <linux/errqueue.h>
+#include <linux/icmp.h>
 #include <stdlib.h>
 #include <netdb.h>
 #include <unistd.h>
