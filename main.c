@@ -103,6 +103,10 @@ int main(int argc, const char** argv)
         recvhints.msg_iov = &iov;
         recvhints.msg_iovlen = 1;
         
+        /* TODO: still have to fix the packet reading and displaying 
+         * as we are either reading
+         * the wrong packet or still improperly reading it */
+
         // Loop until ancillary packet is received
         while (recvmsg(sfd, &recvhints, MSG_ERRQUEUE) == -1);
 
