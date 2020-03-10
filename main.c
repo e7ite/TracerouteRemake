@@ -2,11 +2,12 @@
 
 int main(int argc, const char** argv)
 {
+    struct sockaddr_in connection;
+    memset(&connection, 0, sizeof(connection));
     // Setup the file descriptor table and set interrupt handler
     // to close file descriptors
     struct sigaction handler;
     memset(&handler, 0, sizeof(struct sigaction));
-    memset(&gfd, 0, sizeof(struct FileDescriptorTable));
     handler.sa_handler = &CloseFileDescriptors;
     sigaction(SIGINT, &handler, NULL);
     sigaction(SIGPIPE, &handler, NULL);
@@ -27,15 +28,16 @@ int main(int argc, const char** argv)
     int errcode;
     struct addrinfo* result;
     struct addrinfo hints;
-    hints.ai_family = AF_UNSPEC;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
     hints.ai_flags = 0;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = 0;
-    if ((errcode = getaddrinfo(argv[1], NULL, &hints, &result)))
+    if ((errcode = getaddrinfo(argv[1], "80", &hints, &result)))
         HandleError(gai_strerror(errcode), ERRNO_NOT_SET);
 
     // Iterate through linked list of addresses and attempt to setup a 
-    // a UDP connectionsocket
+    // a UDP connection socket
     int sfd;
     struct addrinfo* addrnode = result;
     for (; addrnode; addrnode = addrnode->ai_next)
@@ -46,10 +48,12 @@ int main(int argc, const char** argv)
 
     if (!addrnode)
         HandleError("Tried all addresses and failed to connect", ERRNO_NOT_SET);
+    if (addrnode->ai_addrlen != sizeof(connection))
+        HandleError("Socket address != sizeof(struct sockaddr)", ERRNO_NOT_SET);
 
-    freeaddrinfo(result);
-
+    memcpy(&connection, addrnode->ai_addr, sizeof(connection));
     AddFileDescriptor(sfd);
+    freeaddrinfo(result);
 
     // Set max hops
     int options = 30;
@@ -62,12 +66,12 @@ int main(int argc, const char** argv)
         HandleError("Failed to set extended error receiving", ERRNO_SET);
 
     const char* msg = "hello";
-    if (sendto(sfd, msg, strlen(msg) + 1, 0, addrnode->ai_addr, addrnode->ai_addrlen) == -1)
+    if (sendto(sfd, msg, strlen(msg) + 1, 0, &connection, sizeof(connection)) == -1)
         HandleError("Failed to send UDP message", ERRNO_SET);
 
     char sendername[0x40];
     struct cmsghdr perrhdr;
-    memset(sendername, 0, 0x40);
+    memset(sendername, 0, sizeof(sendername));
     memset(&perrhdr, 0, sizeof(perrhdr));
 
     struct msghdr recvhints;
@@ -79,12 +83,14 @@ int main(int argc, const char** argv)
     recvhints.msg_control = &perrhdr;
     recvhints.msg_controllen = sizeof(perrhdr);
     
-    int recvcount;
-    if ((recvcount = recvmsg(sfd, &recvhints, MSG_ERRQUEUE)) == -1)
-        HandleError("Problem receiving msg", ERRNO_NOT_SET);
-
-    printf("%i\n", recvcount);
-    puts(recvhints.msg_name);
+    recvmsg(sfd, &recvhints, MSG_ERRQUEUE | MSG_DONTWAIT);
+    for (struct cmsghdr* it = CMSG_FIRSTHDR(&recvhints);
+            it; it = CMSG_NXTHDR(&recvhints, it))
+    {
+        printf("Error level: %i\nProtocol error type: %i\n"
+                "Size of header: %i\n", it->cmsg_level,
+            it->cmsg_type, it->cmsg_len);
+    }
 
     // Close file descriptors and exit program
     CloseFileDescriptors(EXIT_SUCCESS);
