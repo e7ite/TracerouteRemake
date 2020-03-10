@@ -29,7 +29,5 @@ void CloseFileDescriptors(int signal)
 {
     for (int i = 0; i < gfd.fdcount; i++)
         close(gfd.fds[i]);
-    
-    puts("Closed all fds");
     exit(signal);
 }

@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <fcntl.h>
 #include <signal.h> 
+#include <limits.h>
 
 #define ERRNO_SET 1
 #define ERRNO_NOT_SET 0
