@@ -8,7 +8,3 @@ API.
 
 ## Image Preview
 ![](/preview.png)
-
-## Issues
-This currently does not exactly replicate `traceroute(1)` because it gets different 
-results usually after hops > 10.

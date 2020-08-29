@@ -1,6 +1,9 @@
 // Using POSIX standard API
 #define _GNU_SOURCE 1
 
+#ifndef HANDLER_H
+#define HANDLER_H
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,7 +26,8 @@ struct FileDescriptorTable
 {
     int fds[10];
     int fdcount;
-} gfd;
+};
+static struct FileDescriptorTable gfd;
 
 /**
  * @brief Exits program and sends a message informing about the problem
@@ -35,7 +39,7 @@ struct FileDescriptorTable
  * occurs and cannot continue. Will output a description of the error 
  * using perror if possible
 **/
-void __attribute((noreturn)) HandleError(const char* errmsg, char errno);
+void __attribute((noreturn)) HandleError(const char *errmsg, char errno);
 
 /**
  * @brief Adds a file descriptor to file descriptor table
@@ -58,3 +62,5 @@ void AddFileDescriptor(int fd);
  * descriptor properly
 **/
 void __attribute__((noreturn)) CloseFileDescriptors(int signal);
+
+#endif

@@ -1,6 +1,6 @@
 #include "handler.h"
 
-void HandleError(const char* errmsg, char errno)
+void HandleError(const char *errmsg, char errno)
 {
     // Print an error message
     if (errno)
