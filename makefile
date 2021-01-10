@@ -1,2 +1,2 @@
 make:
-	gcc -Wall -Werror handler.c main.c
+	gcc -Wall -Werror -Wextra handler.c main.c
