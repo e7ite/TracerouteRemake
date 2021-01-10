@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/jrjssca6sdpl2vo3?svg=true)](https://ci.appveyor.com/project/e7ite/tracerouteremake)
+
 # TracerouteRemake
 
 This program was made to recreate `traceroute(1)` with an implementaion 

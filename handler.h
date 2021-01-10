@@ -27,7 +27,7 @@ struct FileDescriptorTable
     int fds[10];
     int fdcount;
 };
-static struct FileDescriptorTable gfd;
+extern struct FileDescriptorTable gfd;
 
 /**
  * @brief Exits program and sends a message informing about the problem

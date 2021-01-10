@@ -3,7 +3,6 @@
 int main(int argc, const char* *argv)
 {
     int hops = 1;
-    char orighostname[NI_MAXHOST] = { 0 };
     struct sockaddr_in connection = { 0 };
     
     // Setup the file descriptor table and set interrupt handler
@@ -121,8 +120,8 @@ int main(int argc, const char* *argv)
                 
             // Is TTL expired (continue) or dest unreachable (exit)
             // (ICMP specific)
-            if (err->ee_type != ICMP_DEST_UNREACH 
-                && err->ee_type != ICMP_TIME_EXCEEDED)
+            if (err->ee_type != ICMP_DEST_UNREACH && 
+                err->ee_type != ICMP_TIME_EXCEEDED)
                 continue;
 
             msgReceived = 1;

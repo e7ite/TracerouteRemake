@@ -1,5 +1,7 @@
 #include "handler.h"
 
+struct FileDescriptorTable gfd;
+
 void HandleError(const char *errmsg, char errno)
 {
     // Print an error message
